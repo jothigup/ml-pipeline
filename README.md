@@ -17,7 +17,7 @@ A simple end-to-end ML pipeline for AIPI 510: predict a country's **life expecta
 2. **Preprocess**: StandardScaler on Year and Spending_USD, OneHotEncoder on Country.
 3. **Model**: Linear Regression.
 4. **Evaluate** on the held-out test set (R² and Mean Absolute Error).
-5. **Predict 2021**: retrain on all data (1970–2020), estimate each country's 2021 spending from its 2015–2020 trend, and predict life expectancy.
+5. **Predict 2020**: retrain on 1970–2019 only, predict each country's 2020 life expectancy, and compare with the real 2020 values (we don't have real 2021 data to check against).
 
 ## Results (test set)
 **Test accuracy = 100% within 1 year** (83.6% within 0.5 year) · **Test R² = 0.989** · **Test MAE = 0.29 years**
@@ -31,17 +31,21 @@ A simple end-to-end ML pipeline for AIPI 510: predict a country's **life expecta
 
 Since this is a regression problem (predicting a number), "accuracy" is the % of test predictions within 1 year of the true life expectancy.
 
-## 2021 predictions
-| Country | Est. 2021 spending (USD) | Predicted life expectancy |
-|---|---|---|
-| Canada | 5,849 | 83.3 |
-| France | 5,538 | 83.5 |
-| Germany | 7,168 | 81.4 |
-| Great Britain | 4,984 | 82.2 |
-| Japan | 4,693 | 85.3 |
-| USA | 12,015 | 78.6 |
+## 2020 predictions vs. actual
+Model trained on 1970–2019 only, then asked to predict 2020.
 
-**Limitation:** the model follows long-term trends. It can't see shocks like COVID-19, which lowered life expectancy in 2020–2021, so these 2021 predictions are probably too high for some countries (especially the USA).
+| Country | Actual 2020 | Predicted 2020 | Error |
+|---|---|---|---|
+| Canada | 81.7 | 83.1 | +1.4 |
+| France | 82.3 | 83.4 | +1.1 |
+| Germany | 81.1 | 81.4 | +0.3 |
+| Great Britain | 80.4 | 82.0 | +1.6 |
+| Japan | 84.7 | 85.1 | +0.4 |
+| USA | 77.0 | 78.7 | +1.7 |
+
+**2020 MAE = 1.08 years** · **2020 accuracy (within 1 year) = 33.3%** (2 of 6 countries) · 2020 R² = 0.72
+
+**Why 2020 is worse than the test set:** the model **over-predicted every country**, because COVID-19 lowered life expectancy in 2020 and the model only knows the long-term upward trend. The two countries it got closest (Japan, Germany) had smaller COVID drops that year, and Japan's life expectancy actually rose. This shows the model works well under normal conditions but can't foresee sudden shocks.
 
 ## How to run
 ```bash
