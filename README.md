@@ -4,6 +4,7 @@ A simple end-to-end ML pipeline for AIPI 510: predict a country's **life expecta
 
 ## Data
 `data/clean/healthexp.csv`: 274 rows, 6 countries (Canada, France, Germany, Great Britain, Japan, USA), 1970–2020.
+https://www.kaggle.com/datasets/abdoomoh/all-seaborn-built-in-datasets
 
 | Column | Use |
 |---|---|
