@@ -49,6 +49,9 @@ pipe.fit(X_train, y_train)
 pred = pipe.predict(X_test)
 print(f"\nLinear Regression  test R2 = {r2_score(y_test, pred):.3f}   "
       f"test MAE = {mean_absolute_error(y_test, pred):.2f} years")
+errors = np.abs(pred - y_test)
+print(f"Test accuracy (within 1 year):   {(errors <= 1).mean():.1%}")
+print(f"Test accuracy (within 0.5 year): {(errors <= 0.5).mean():.1%}")
 
 # 4. Predict 2021 -----------------------------------------------------------
 # Retrain on ALL data (train + test) so the model uses every year up to 2020.
