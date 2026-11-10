@@ -53,24 +53,24 @@ errors = np.abs(pred - y_test)
 print(f"Test accuracy (within 1 year):   {(errors <= 1).mean():.1%}")
 print(f"Test accuracy (within 0.5 year): {(errors <= 0.5).mean():.1%}")
 
-# 4. Predict 2021 -----------------------------------------------------------
-# Retrain on ALL data (train + test) so the model uses every year up to 2020.
+# 4. Predict 2020 and compare with the real 2020 values -------------------
+# Train on 1970-2019 only, so the model never sees 2020.
 full = pd.concat([train, test])
+past = full[full.Year <= 2019]
+y2020 = full[full.Year == 2020].copy()
+
 pipe = make_pipeline(LinearRegression())
-pipe.fit(full[NUM_COLS + CAT_COLS], full[TARGET])
+pipe.fit(past[NUM_COLS + CAT_COLS], past[TARGET])
+y2020["Predicted_Life_Expectancy"] = pipe.predict(y2020[NUM_COLS + CAT_COLS])
+y2020["Error"] = y2020["Predicted_Life_Expectancy"] - y2020[TARGET]
 
-# 2021 spending isn't in the data, so estimate it per country by
-# fitting a straight-line trend to that country's 2015-2020 spending.
-rows = []
-for country, g in full[full.Year >= 2015].groupby("Country"):
-    slope, intercept = np.polyfit(g.Year, g.Spending_USD, 1)
-    rows.append({"Year": 2021, "Country": country,
-                 "Spending_USD": slope * 2021 + intercept})
-future = pd.DataFrame(rows)
-future["Predicted_Life_Expectancy_2021"] = pipe.predict(future[NUM_COLS + CAT_COLS])
+print("\n2020 predictions vs. actual (model trained on 1970-2019):")
+print(y2020[["Country", TARGET, "Predicted_Life_Expectancy", "Error"]]
+      .round(2).sort_values("Country").to_string(index=False))
+err2020 = y2020["Error"].abs()
+print(f"\n2020 MAE = {err2020.mean():.2f} years   "
+      f"2020 R2 = {r2_score(y2020[TARGET], y2020['Predicted_Life_Expectancy']):.3f}")
+print(f"2020 accuracy (within 1 year): {(err2020 <= 1).mean():.1%}")
 
-print("\nPredicted life expectancy for 2021:")
-print(future.round({"Spending_USD": 0, "Predicted_Life_Expectancy_2021": 1})
-      .to_string(index=False))
-future.to_csv("predictions_2021.csv", index=False)
-print("\nSaved predictions_2021.csv")
+y2020.sort_values("Country").to_csv("predictions_2020.csv", index=False)
+print("\nSaved predictions_2020.csv")
