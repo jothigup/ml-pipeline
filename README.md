@@ -13,16 +13,23 @@ A simple end-to-end ML pipeline for AIPI 510: predict a country's **life expecta
 | Life_Expectancy | **target** |
 
 ## Pipeline
-1. **Load** Jothi's processed train/test data (`data/processed/`).
+1. **Load** `data/clean/healthexp.csv` (cleaned by Jothi) and split it 80% train / 20% test (`random_state=42`).
 2. **Preprocess**: StandardScaler on Year and Spending_USD, OneHotEncoder on Country.
 3. **Model**: Linear Regression.
 4. **Evaluate** on the held-out test set (R² and Mean Absolute Error).
 5. **Predict 2021**: retrain on all data (1970–2020), estimate each country's 2021 spending from its 2015–2020 trend, and predict life expectancy.
 
 ## Results (test set)
-| Model | Test R² | Test MAE |
-|---|---|---|
-| Linear Regression | 0.989 | 0.29 years |
+**Test accuracy = 100% within 1 year** (83.6% within 0.5 year) · **Test R² = 0.989** · **Test MAE = 0.29 years**
+
+| Metric (55 test rows) | Value |
+|---|---|
+| Test accuracy: predictions within 1 year of true value | **100%** |
+| Test accuracy: predictions within 0.5 year of true value | 83.6% |
+| Test R² (variance explained) | 0.989 |
+| Test MAE (average error) | 0.29 years |
+
+Since this is a regression problem (predicting a number), "accuracy" is the % of test predictions within 1 year of the true life expectancy.
 
 ## 2021 predictions
 | Country | Est. 2021 spending (USD) | Predicted life expectancy |
